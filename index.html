@@ -115,5 +115,375 @@
     </footer>
 
     <script src="script.js"></script>
-</body>
+
+<!-- ============================================ -->
+<!-- PAINEL ADMINISTRATIVO BESTFORGE              -->
+<!-- ============================================ -->
+
+<!-- Botão flutuante do Admin -->
+<div class="admin-fab" id="adminFab" title="Painel Administrativo">
+    <span class="admin-fab-icon">⚙️</span>
+</div>
+
+<!-- Overlay do painel -->
+<div class="admin-overlay" id="adminOverlay"></div>
+
+<!-- Painel Principal -->
+<div class="admin-panel" id="adminPanel">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">
+            <span>⚡</span>
+            <span>BESTFORGE Admin</span>
+        </div>
+        
+        <nav class="admin-nav">
+            <a href="#" class="admin-nav-item active" data-tab="dashboard">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </a>
+            <a href="#" class="admin-nav-item" data-tab="products">
+                <span class="nav-icon">📦</span>
+                Produtos
+            </a>
+            <a href="#" class="admin-nav-item" data-tab="categories">
+                <span class="nav-icon">📁</span>
+                Categorias
+            </a>
+            <a href="#" class="admin-nav-item" data-tab="pages">
+                <span class="nav-icon">📄</span>
+                Páginas
+            </a>
+            <a href="#" class="admin-nav-item" data-tab="settings">
+                <span class="nav-icon">🎨</span>
+                Aparência
+            </a>
+        </nav>
+        
+        <div class="admin-sidebar-footer">
+            <button class="btn-exit-admin" id="btnExitAdmin">
+                <span>🚪</span> Sair do Admin
+            </button>
+        </div>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div class="admin-main">
+        <!-- Header -->
+        <div class="admin-main-header">
+            <h2 id="adminTabTitle">📊 Dashboard</h2>
+            <div class="admin-actions">
+                <button class="btn-save-all" id="btnSaveAll">
+                    💾 Salvar Tudo
+                </button>
+                <button class="btn-preview" id="btnPreview">
+                    👁️ Preview
+                </button>
+            </div>
+        </div>
+        
+        <!-- Conteúdo das Tabs -->
+        <div class="admin-content">
+            
+            <!-- TAB: DASHBOARD -->
+            <div class="admin-tab active" id="tab-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="statProducts">0</span>
+                            <span class="stat-label">Produtos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📁</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="statCategories">0</span>
+                            <span class="stat-label">Categorias</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="statSales">0</span>
+                            <span class="stat-label">Vendas Hoje</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="statVisitors">0</span>
+                            <span class="stat-label">Visitantes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3>⚡ Ações Rápidas</h3>
+                    <div class="action-buttons">
+                        <button class="quick-action-btn" data-action="add-product">
+                            <span>➕</span> Novo Produto
+                        </button>
+                        <button class="quick-action-btn" data-action="add-category">
+                            <span>📁</span> Nova Categoria
+                        </button>
+                        <button class="quick-action-btn" data-action="add-page">
+                            <span>📄</span> Nova Página
+                        </button>
+                        <button class="quick-action-btn" data-action="export">
+                            <span>📥</span> Exportar Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB: PRODUTOS -->
+            <div class="admin-tab" id="tab-products">
+                <div class="tab-header">
+                    <div class="tab-actions">
+                        <button class="btn-add" id="btnAddProduct">
+                            ➕ Adicionar Produto
+                        </button>
+                        <input type="text" class="search-input" id="adminProductSearch" placeholder="🔍 Buscar produtos...">
+                    </div>
+                </div>
+                
+                <!-- Lista de Produtos -->
+                <div class="products-admin-list" id="adminProductsList">
+                    <!-- Renderizado via JS -->
+                </div>
+                
+                <!-- Modal de Produto -->
+                <div class="modal" id="productModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modalTitle">➕ Novo Produto</h3>
+                            <button class="modal-close" data-close="productModal">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label>Nome do Produto *</label>
+                                    <input type="text" id="editProductName" placeholder="Ex: NVIDIA GeForce RTX 4090">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row cols-3">
+                                <div class="form-group">
+                                    <label>Categoria *</label>
+                                    <select id="editProductCategory">
+                                        <option value="">Selecionar...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ícone (Emoji)</label>
+                                    <div class="emoji-picker-container">
+                                        <input type="text" id="editProductIcon" placeholder="🎮" maxlength="2">
+                                        <div class="emoji-suggestions" id="emojiSuggestions">
+                                            <span class="emoji-option">🎮</span>
+                                            <span class="emoji-option">💻</span>
+                                            <span class="emoji-option">⚡</span>
+                                            <span class="emoji-option">💾</span>
+                                            <span class="emoji-option">🎯</span>
+                                            <span class="emoji-option">🔥</span>
+                                            <span class="emoji-option">🌈</span>
+                                            <span class="emoji-option">🚀</span>
+                                            <span class="emoji-option">🖥️</span>
+                                            <span class="emoji-option">⌨️</span>
+                                            <span class="emoji-option">🖱️</span>
+                                            <span class="emoji-option">🎧</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Badge</label>
+                                    <select id="editProductBadge">
+                                        <option value="">Nenhum</option>
+                                        <option value="sale">🔥 Oferta</option>
+                                        <option value="new">✨ Novo</option>
+                                        <option value="hot">💎 Destaque</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row cols-2">
+                                <div class="form-group">
+                                    <label>Preço (R$) *</label>
+                                    <input type="number" id="editProductPrice" placeholder="0.00" step="0.01" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Preço Antigo (R$)</label>
+                                    <input type="number" id="editProductOldPrice" placeholder="0.00" step="0.01" min="0">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label>Descrição</label>
+                                    <textarea id="editProductDescription" rows="3" placeholder="Descreva o produto..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row cols-2">
+                                <div class="form-group">
+                                    <label>Estoque</label>
+                                    <input type="number" id="editProductStock" value="10" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Avaliação (0-5)</label>
+                                    <input type="number" id="editProductRating" value="5.0" step="0.1" min="0" max="5">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label>Especificações (JSON)</label>
+                                    <textarea id="editProductSpecs" rows="3" placeholder='{"memoria": "24GB GDDR6X", "clock": "2520 MHz"}'></textarea>
+                                    <small style="color: #666; display: block; margin-top: 0.3rem;">
+                                        Formato: {"chave": "valor", "outra": "valor"}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" data-close="productModal">Cancelar</button>
+                            <button class="btn-save" id="btnSaveProduct">💾 Salvar Produto</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB: CATEGORIAS -->
+            <div class="admin-tab" id="tab-categories">
+                <div class="tab-header">
+                    <button class="btn-add" id="btnAddCategory">
+                        ➕ Nova Categoria
+                    </button>
+                </div>
+                
+                <div class="categories-admin-list" id="adminCategoriesList">
+                    <!-- Renderizado via JS -->
+                </div>
+                
+                <!-- Modal de Categoria -->
+                <div class="modal" id="categoryModal">
+                    <div class="modal-content modal-small">
+                        <div class="modal-header">
+                            <h3>📁 Nova Categoria</h3>
+                            <button class="modal-close" data-close="categoryModal">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Nome da Categoria *</label>
+                                <input type="text" id="editCategoryName" placeholder="Ex: Placas de Vídeo">
+                            </div>
+                            <div class="form-group">
+                                <label>Ícone (Emoji)</label>
+                                <input type="text" id="editCategoryIcon" placeholder="🎮" maxlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label>Slug (URL)</label>
+                                <input type="text" id="editCategorySlug" placeholder="placas-de-video" readonly>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" data-close="categoryModal">Cancelar</button>
+                            <button class="btn-save" id="btnSaveCategory">💾 Salvar Categoria</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB: PÁGINAS -->
+            <div class="admin-tab" id="tab-pages">
+                <div class="tab-header">
+                    <button class="btn-add" id="btnAddPage">
+                        ➕ Nova Página
+                    </button>
+                </div>
+                
+                <div class="pages-admin-list" id="adminPagesList">
+                    <!-- Renderizado via JS -->
+                </div>
+                
+                <!-- Modal de Página -->
+                <div class="modal" id="pageModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>📄 Editor de Página</h3>
+                            <button class="modal-close" data-close="pageModal">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Título da Página *</label>
+                                <input type="text" id="editPageTitle" placeholder="Ex: Sobre Nós">
+                            </div>
+                            <div class="form-group">
+                                <label>Slug (URL)</label>
+                                <input type="text" id="editPageSlug" placeholder="sobre-nos">
+                            </div>
+                            <div class="form-group">
+                                <label>Ícone (Emoji)</label>
+                                <input type="text" id="editPageIcon" placeholder="📄" maxlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label>Conteúdo HTML</label>
+                                <textarea id="editPageContent" rows="10" placeholder="<h1>Bem-vindo!</h1><p>Conteúdo da página...</p>"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-cancel" data-close="pageModal">Cancelar</button>
+                            <button class="btn-save" id="btnSavePage">💾 Salvar Página</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB: APARÊNCIA -->
+            <div class="admin-tab" id="tab-settings">
+                <div class="settings-section">
+                    <h3>🎨 Cores do Tema</h3>
+                    <div class="color-pickers">
+                        <div class="form-group">
+                            <label>Cor Primária</label>
+                            <input type="color" id="editPrimaryColor" value="#6c5ce7">
+                        </div>
+                        <div class="form-group">
+                            <label>Cor Secundária</label>
+                            <input type="color" id="editSecondaryColor" value="#a8e6cf">
+                        </div>
+                        <div class="form-group">
+                            <label>Cor de Fundo 1</label>
+                            <input type="color" id="editBgColor1" value="#667eea">
+                        </div>
+                        <div class="form-group">
+                            <label>Cor de Fundo 2</label>
+                            <input type="color" id="editBgColor2" value="#764ba2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>📝 Textos do Site</h3>
+                    <div class="form-group">
+                        <label>Nome da Loja</label>
+                        <input type="text" id="editStoreName" value="BESTFORGE">
+                    </div>
+                    <div class="form-group">
+                        <label>Slogan</label>
+                        <input type="text" id="editSlogan" value="Hardware de Alta Performance">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição do Hero</label>
+                        <textarea id="editHeroDescription" rows="2">Os melhores componentes para seu setup gamer e workstation profissional</textarea>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Toast de Notificação Admin -->
+<div class="admin-toast" id="adminToast"></div> </body>
 </html>
