@@ -97,7 +97,12 @@ function renderProducts(list) {
         if (p.badge) {
             html += '<div class="product-badge ' + p.badge + '">' + p.badgeText + '</div>';
         }
-        html += '<div class="product-image">' + p.icon + '</div>';
+       // Se tiver imagem, usa a imagem. Se não, usa o ícone
+if (p.image) {
+    html += '<div class="product-image"><img src="' + p.image + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:cover;"></div>';
+} else {
+    html += '<div class="product-image">' + p.icon + '</div>';
+}
         html += '<div class="product-info">';
         html += '<div class="product-category">' + p.category + '</div>';
         html += '<h3 class="product-name">' + p.name + '</h3>';
