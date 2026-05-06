@@ -1,9 +1,9 @@
 // ============================================
-// BESTFORGE - JAVASCRIPT PRINCIPAL
+// BESTFORGE - JAVASCRIPT COMPLETO COM ADMIN
 // ============================================
 
 // Dados dos produtos
-const products = [
+let products = [
     {
         id: 1,
         name: 'GeForce RTX 4090',
@@ -14,7 +14,8 @@ const products = [
         icon: '🎮',
         badge: 'sale',
         badgeText: 'OFERTA',
-        stock: 15
+        stock: 15,
+        rating: 4.9
     },
     {
         id: 2,
@@ -26,7 +27,8 @@ const products = [
         icon: '💻',
         badge: 'new',
         badgeText: 'NOVO',
-        stock: 25
+        stock: 25,
+        rating: 4.8
     },
     {
         id: 3,
@@ -38,7 +40,8 @@ const products = [
         icon: '⚡',
         badge: 'sale',
         badgeText: 'OFERTA',
-        stock: 50
+        stock: 50,
+        rating: 4.7
     },
     {
         id: 4,
@@ -50,7 +53,8 @@ const products = [
         icon: '💾',
         badge: 'new',
         badgeText: 'NOVO',
-        stock: 30
+        stock: 30,
+        rating: 4.9
     },
     {
         id: 5,
@@ -62,7 +66,8 @@ const products = [
         icon: '🎯',
         badge: 'sale',
         badgeText: 'OFERTA',
-        stock: 20
+        stock: 20,
+        rating: 4.6
     },
     {
         id: 6,
@@ -74,7 +79,8 @@ const products = [
         icon: '🔥',
         badge: 'new',
         badgeText: 'NOVO',
-        stock: 18
+        stock: 18,
+        rating: 4.8
     },
     {
         id: 7,
@@ -86,7 +92,8 @@ const products = [
         icon: '🌈',
         badge: 'sale',
         badgeText: 'OFERTA',
-        stock: 12
+        stock: 12,
+        rating: 4.7
     },
     {
         id: 8,
@@ -98,7 +105,8 @@ const products = [
         icon: '🚀',
         badge: 'new',
         badgeText: 'NOVO',
-        stock: 8
+        stock: 8,
+        rating: 4.5
     }
 ];
 
@@ -107,7 +115,7 @@ let cart = [];
 let currentCategory = 'all';
 
 // ============================================
-// INICIALIZAÇÃO
+// INICIALIZAÇÃO DO SITE
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -115,24 +123,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Carregar dados salvos
     loadFromStorage();
+    loadAdminData();
     
     // Renderizar produtos
     renderProducts(products);
+    renderCategoriesButtons();
     
     // Atualizar UI do carrinho
     updateCartUI();
     
     // Configurar event listeners
-    setupEventListeners();
+    setupSiteEvents();
+    
+    // Inicializar Admin
+    initAdmin();
     
     console.log('✅ BESTFORGE pronto!');
 });
 
 // ============================================
-// EVENT LISTENERS
+// EVENT LISTENERS DO SITE
 // ============================================
 
-function setupEventListeners() {
+function setupSiteEvents() {
     // Botão do carrinho
     document.getElementById('cartBtn').addEventListener('click', toggleCart);
     document.getElementById('closeCart').addEventListener('click', toggleCart);
@@ -150,13 +163,6 @@ function setupEventListeners() {
     document.getElementById('searchBtn').addEventListener('click', filterProducts);
     document.getElementById('searchInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') filterProducts();
-    });
-    
-    // Categorias
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            filterByCategory(this.dataset.category);
-        });
     });
     
     // Input AI - Enter para enviar
@@ -179,9 +185,10 @@ function renderProducts(productsToRender) {
     
     if (!productsToRender || productsToRender.length === 0) {
         grid.innerHTML = `
-            <div class="no-products">
-                <h3>😕 Nenhum produto encontrado</h3>
-                <p>Tente outros termos de busca ou categorias</p>
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <div class="empty-state-icon">📦</div>
+                <h3 style="color: white;">Nenhum produto encontrado</h3>
+                <p style="color: rgba(255,255,255,0.8);">Tente outros termos de busca ou categorias</p>
             </div>
         `;
         return;
@@ -215,6 +222,25 @@ function renderProducts(productsToRender) {
         btn.addEventListener('click', function() {
             const productId = parseInt(this.dataset.productId);
             addToCart(productId, this);
+        });
+    });
+}
+
+function renderCategoriesButtons() {
+    const container = document.getElementById('categoriesContainer');
+    const categories = [...new Set(products.map(p => p.category))];
+    
+    let html = '<button class="category-btn active" data-category="all">Todos</button>';
+    categories.forEach(cat => {
+        html += `<button class="category-btn" data-category="${cat}">${cat}</button>`;
+    });
+    
+    container.innerHTML = html;
+    
+    // Adicionar event listeners
+    container.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterByCategory(this.dataset.category);
         });
     });
 }
@@ -357,7 +383,157 @@ function filterByCategory(category) {
     // Atualizar botões ativos
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.classList.remove('active');
-        if (
+        if (btn.dataset.category === category) {
+            btn.classList.add('active');
+        }
+    });
+    
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = category === 'all' 
+        ? products 
+        : products.filter(p => p.category === category);
+    
+    if (searchTerm) {
+        filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(searchTerm) || 
+            p.description.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    renderProducts(filtered);
+}
+
+function filterProducts() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = currentCategory === 'all' 
+        ? products 
+        : products.filter(p => p.category === currentCategory);
+    
+    if (searchTerm) {
+        filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(searchTerm) || 
+            p.description.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    renderProducts(filtered);
+}
+
+// ============================================
+// CHAT AI
+// ============================================
+
+function toggleAIChat() {
+    const chatModal = document.getElementById('aiChatModal');
+    if (chatModal) {
+        chatModal.classList.toggle('open');
+    }
+}
+
+function sendAIMessage() {
+    const input = document.getElementById('aiInput');
+    const messagesContainer = document.getElementById('aiChatMessages');
+    
+    if (!input || !messagesContainer) return;
+    
+    const message = input.value.trim();
+    if (!message) return;
+    
+    // Adicionar mensagem do usuário
+    messagesContainer.innerHTML += `
+        <div class="user-message">
+            <strong>Você:</strong> ${message}
+        </div>
+    `;
+    
+    // Simular resposta da AI
+    setTimeout(() => {
+        const response = generateAIResponse(message.toLowerCase());
+        messagesContainer.innerHTML += `
+            <div class="ai-message">
+                <strong>🤖 AI:</strong> ${response}
+            </div>
+        `;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 1000);
+    
+    input.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function generateAIResponse(message) {
+    if (message.includes('gpu') || message.includes('placa') || message.includes('vídeo')) {
+        return 'Temos excelentes GPUs! A RTX 4090 é nossa campeã de performance, mas a RTX 4070 Ti Super oferece ótimo custo-benefício.';
+    }
+    if (message.includes('cpu') || message.includes('processador')) {
+        return 'O AMD Ryzen 9 7950X é incrível para produtividade, enquanto o Intel i9-14900K domina em jogos.';
+    }
+    if (message.includes('ram') || message.includes('memória')) {
+        return 'Recomendo no mínimo 32GB DDR5 para games atuais. A Corsair Vengeance é nossa mais vendida!';
+    }
+    if (message.includes('ssd') || message.includes('armazenamento') || message.includes('nvme')) {
+        return 'Os SSDs NVMe Gen4 como Samsung 990 Pro atingem velocidades de 7450MB/s!';
+    }
+    if (message.includes('preço') || message.includes('valor') || message.includes('custo')) {
+        return 'Temos opções para todos os orçamentos! A RTX 4090 está com 13% OFF e a Corsair Vengeance com 25% de desconto.';
+    }
+    if (message.includes('frete') || message.includes('entrega')) {
+        return 'Frete grátis para compras acima de R$ 500! Entrega rápida para todo Brasil.';
+    }
+    
+    return 'Interessante! Posso te ajudar com recomendações de hardware. Me diga qual tipo de componente você procura!';
+}
+
+// ============================================
+// NOTIFICAÇÕES
+// ============================================
+
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    
+    if (!notification) return;
+    
+    notification.textContent = message;
+    notification.style.background = type === 'error' ? '#e74c3c' : '#2ecc71';
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+// ============================================
+// PERSISTÊNCIA DE DADOS
+// ============================================
+
+function saveToStorage() {
+    try {
+        localStorage.setItem('bestforge_cart', JSON.stringify(cart));
+        localStorage.setItem('bestforge_products', JSON.stringify(products));
+    } catch (e) {
+        console.error('Erro ao salvar dados:', e);
+    }
+}
+
+function loadFromStorage() {
+    try {
+        const savedCart = localStorage.getItem('bestforge_cart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+        }
+        
+        const savedProducts = localStorage.getItem('bestforge_products');
+        if (savedProducts) {
+            products = JSON.parse(savedProducts);
+        }
+    } catch (e) {
+        console.error('Erro ao carregar dados:', e);
+        cart = [];
+    }
+}
+
 // ============================================
 // PAINEL ADMINISTRATIVO - LÓGICA
 // ============================================
@@ -376,9 +552,9 @@ const adminState = {
         { name: 'Storage', slug: 'storage', icon: '💾', active: true }
     ],
     pages: [
-        { title: 'Home', slug: 'home', icon: '🏠', active: true },
-        { title: 'Produtos', slug: 'produtos', icon: '📦', active: true },
-        { title: 'Sobre', slug: 'sobre', icon: 'ℹ️', active: false }
+        { title: 'Home', slug: 'home', icon: '🏠', active: true, content: '' },
+        { title: 'Produtos', slug: 'produtos', icon: '📦', active: true, content: '' },
+        { title: 'Sobre', slug: 'sobre', icon: 'ℹ️', active: false, content: '' }
     ],
     settings: {
         storeName: 'BESTFORGE',
@@ -393,10 +569,11 @@ const adminState = {
 
 // Inicializar Admin
 function initAdmin() {
-    console.log('⚙️ Admin inicializado');
+    console.log('⚙️ Painel Admin inicializado');
     loadAdminData();
     setupAdminEvents();
     updateDashboardStats();
+    applyAllSettings();
 }
 
 // Carregar dados salvos
@@ -410,17 +587,16 @@ function loadAdminData() {
     }
 }
 
-// Salvar dados
+// Salvar dados do admin
 function saveAdminData() {
     localStorage.setItem('bestforge_admin', JSON.stringify({
         categories: adminState.categories,
         pages: adminState.pages,
         settings: adminState.settings
     }));
-    showAdminToast('💾 Dados salvos com sucesso!', 'success');
 }
 
-// Setup de eventos
+// Setup de eventos do admin
 function setupAdminEvents() {
     // Abrir/Fechar painel
     document.getElementById('adminFab').addEventListener('click', toggleAdmin);
@@ -455,7 +631,7 @@ function setupAdminEvents() {
     });
     
     // Botões de adicionar
-    document.getElementById('btnAddProduct').addEventListener('click', openProductModal);
+    document.getElementById('btnAddProduct').addEventListener('click', () => openProductModal());
     document.getElementById('btnAddCategory').addEventListener('click', openCategoryModal);
     document.getElementById('btnAddPage').addEventListener('click', openPageModal);
     
@@ -492,15 +668,7 @@ function setupAdminEvents() {
         });
     });
     
-    // Emoji picker
-    document.querySelectorAll('.emoji-option').forEach(emoji => {
-        emoji.addEventListener('click', function() {
-            const input = this.closest('.emoji-picker-container').querySelector('input');
-            input.value = this.textContent;
-        });
-    });
-    
-    // Auto slug
+    // Auto slug para categoria
     document.getElementById('editCategoryName').addEventListener('input', function() {
         document.getElementById('editCategorySlug').value = 
             this.value.toLowerCase()
@@ -508,14 +676,17 @@ function setupAdminEvents() {
                 .replace(/^-+|-+$/g, '');
     });
     
-    // Busca de produtos
-    document.getElementById('adminProductSearch').addEventListener('input', function() {
-        renderAdminProducts(this.value);
+    // Auto slug para página
+    document.getElementById('editPageTitle').addEventListener('input', function() {
+        document.getElementById('editPageSlug').value = 
+            this.value.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
     });
     
-    // Settings live preview
-    ['editPrimaryColor', 'editBgColor1', 'editBgColor2'].forEach(id => {
-        document.getElementById(id).addEventListener('input', applySettingsPreview);
+    // Busca de produtos no admin
+    document.getElementById('adminProductSearch').addEventListener('input', function() {
+        renderAdminProducts(this.value);
     });
 }
 
@@ -532,12 +703,12 @@ function toggleAdmin() {
         renderAdminCategories();
         renderAdminPages();
         loadSettingsToForm();
-        
-        // Esconder scroll da página principal
         document.body.style.overflow = 'hidden';
     } else {
         document.body.style.overflow = '';
         applyAllSettings();
+        renderCategoriesButtons();
+        renderProducts(products);
     }
 }
 
@@ -554,7 +725,8 @@ function switchTab(tabName) {
     document.querySelectorAll('.admin-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    document.getElementById(`tab-${tabName}`).classList.add('active');
+    const tabElement = document.getElementById(`tab-${tabName}`);
+    if (tabElement) tabElement.classList.add('active');
     
     // Atualizar título
     const titles = {
@@ -580,18 +752,39 @@ function updateDashboardStats() {
     document.getElementById('statCategories').textContent = 
         [...new Set(products.map(p => p.category))].length;
     document.getElementById('statSales').textContent = 
-        Math.floor(Math.random() * 50) + 10; // Simulado
+        Math.floor(Math.random() * 50) + 10;
     document.getElementById('statVisitors').textContent = 
-        Math.floor(Math.random() * 1000) + 200; // Simulado
+        Math.floor(Math.random() * 1000) + 200;
+    
+    // Produtos recentes
+    const recentList = document.getElementById('recentProductsList');
+    if (recentList) {
+        const recent = products.slice(-5).reverse();
+        recentList.innerHTML = recent.map(p => `
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid #eee;">
+                <span style="font-size: 2rem;">${p.icon}</span>
+                <div style="flex: 1;">
+                    <strong>${p.name}</strong>
+                    <div style="color: #666; font-size: 0.9rem;">${p.category} - R$ ${p.price.toLocaleString('pt-BR')}</div>
+                </div>
+                <span style="color: #27ae60; font-weight: 600;">Em estoque</span>
+            </div>
+        `).join('');
+    }
 }
 
 // ============================================
-// PRODUTOS
+// PRODUTOS (ADMIN)
 // ============================================
 
 function openProductModal(productId = null) {
     const modal = document.getElementById('productModal');
     const title = document.getElementById('modalTitle');
+    
+    // Popular categorias
+    const categorySelect = document.getElementById('editProductCategory');
+    categorySelect.innerHTML = '<option value="">Selecionar...</option>' + 
+        adminState.categories.map(cat => `<option value="${cat.name}">${cat.icon} ${cat.name}</option>`).join('');
     
     if (productId) {
         // Editar
@@ -613,16 +806,17 @@ function openProductModal(productId = null) {
         // Novo
         adminState.editingProduct = null;
         title.textContent = '➕ Novo Produto';
-        document.getElementById('productModal').querySelectorAll('input, textarea, select').forEach(el => {
-            if (el.type !== 'number') el.value = '';
-            else el.value = el.id === 'editProductStock' ? '10' : el.id === 'editProductRating' ? '5.0' : '';
+        // Limpar formulário
+        ['editProductName', 'editProductIcon', 'editProductDescription'].forEach(id => {
+            document.getElementById(id).value = '';
         });
+        document.getElementById('editProductCategory').value = '';
+        document.getElementById('editProductBadge').value = '';
+        document.getElementById('editProductPrice').value = '';
+        document.getElementById('editProductOldPrice').value = '';
+        document.getElementById('editProductStock').value = '10';
+        document.getElementById('editProductRating').value = '5.0';
     }
-    
-    // Popular categorias
-    const categorySelect = document.getElementById('editProductCategory');
-    categorySelect.innerHTML = '<option value="">Selecionar...</option>' + 
-        adminState.categories.map(cat => `<option value="${cat.name}">${cat.icon} ${cat.name}</option>`).join('');
     
     modal.classList.add('active');
 }
@@ -637,6 +831,9 @@ function saveProduct() {
         return;
     }
     
+    const badgeValue = document.getElementById('editProductBadge').value;
+    const badgeTexts = { sale: 'OFERTA', new: 'NOVO', hot: 'DESTAQUE' };
+    
     const productData = {
         name,
         category,
@@ -644,8 +841,8 @@ function saveProduct() {
         oldPrice: parseFloat(document.getElementById('editProductOldPrice').value) || null,
         description: document.getElementById('editProductDescription').value.trim() || 'Sem descrição',
         icon: document.getElementById('editProductIcon').value || '📦',
-        badge: document.getElementById('editProductBadge').value || null,
-        badgeText: { sale: 'OFERTA', new: 'NOVO', hot: 'DESTAQUE' }[document.getElementById('editProductBadge').value] || '',
+        badge: badgeValue || null,
+        badgeText: badgeTexts[badgeValue] || '',
         stock: parseInt(document.getElementById('editProductStock').value) || 0,
         rating: parseFloat(document.getElementById('editProductRating').value) || 5.0
     };
@@ -667,6 +864,7 @@ function saveProduct() {
     closeModal('productModal');
     renderAdminProducts();
     renderProducts(products);
+    renderCategoriesButtons();
     saveAllData();
 }
 
@@ -691,14 +889,10 @@ function deleteProduct(productId) {
         products = products.filter(p => p.id !== productId);
         renderAdminProducts();
         renderProducts(products);
+        renderCategoriesButtons();
         saveAllData();
         showAdminToast('🗑️ Produto excluído!', 'error');
     }
-}
-
-function toggleProductVisibility(productId) {
-    // Implementação futura
-    showAdminToast('Funcionalidade em desenvolvimento', 'info');
 }
 
 function renderAdminProducts(search = '') {
@@ -725,7 +919,7 @@ function renderAdminProducts(search = '') {
     }
     
     container.innerHTML = filtered.map(product => `
-        <div class="admin-product-item" draggable="true" data-product-id="${product.id}">
+        <div class="admin-product-item">
             <div class="admin-product-icon">${product.icon}</div>
             <div class="admin-product-info">
                 <div class="admin-product-name">
@@ -742,18 +936,14 @@ function renderAdminProducts(search = '') {
             <div class="admin-product-actions">
                 <button class="btn-icon btn-edit" onclick="openProductModal(${product.id})" title="Editar">✏️</button>
                 <button class="btn-icon btn-duplicate" onclick="duplicateProduct(${product.id})" title="Duplicar">📋</button>
-                <button class="btn-icon btn-toggle ${product.active !== false ? 'on' : 'off'}" onclick="toggleProductVisibility(${product.id})" title="Visibilidade">👁️</button>
                 <button class="btn-icon btn-delete" onclick="deleteProduct(${product.id})" title="Excluir">🗑️</button>
             </div>
         </div>
     `).join('');
-    
-    // Drag and Drop
-    setupDragAndDrop();
 }
 
 // ============================================
-// CATEGORIAS
+// CATEGORIAS (ADMIN)
 // ============================================
 
 function openCategoryModal() {
@@ -773,17 +963,26 @@ function saveCategory() {
         return;
     }
     
+    // Verificar se já existe
+    if (adminState.categories.find(c => c.name === name)) {
+        showAdminToast('❌ Esta categoria já existe!', 'error');
+        return;
+    }
+    
     adminState.categories.push({ name, slug, icon, active: true });
     closeModal('categoryModal');
     renderAdminCategories();
+    renderCategoriesButtons();
     saveAllData();
     showAdminToast('✅ Categoria adicionada!', 'success');
 }
 
 function deleteCategory(index) {
-    if (confirm('Excluir esta categoria?')) {
+    const cat = adminState.categories[index];
+    if (confirm(`Excluir categoria "${cat.name}"?`)) {
         adminState.categories.splice(index, 1);
         renderAdminCategories();
+        renderCategoriesButtons();
         saveAllData();
         showAdminToast('🗑️ Categoria excluída!', 'error');
     }
@@ -796,7 +995,7 @@ function renderAdminCategories() {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📁</div>
-                <p>Nenhuma categoria</p>
+                <p>Nenhuma categoria cadastrada</p>
             </div>
         `;
         return;
@@ -815,14 +1014,14 @@ function renderAdminCategories() {
                 </div>
             </div>
             <div class="admin-product-actions">
-                <button class="btn-icon btn-delete" onclick="deleteCategory(${index})">🗑️</button>
+                <button class="btn-icon btn-delete" onclick="deleteCategory(${index})" title="Excluir">🗑️</button>
             </div>
         </div>
     `).join('');
 }
 
 // ============================================
-// PÁGINAS
+// PÁGINAS (ADMIN)
 // ============================================
 
 function openPageModal() {
@@ -851,6 +1050,15 @@ function savePage() {
     showAdminToast('✅ Página adicionada!', 'success');
 }
 
+function deletePage(index) {
+    if (confirm('Excluir esta página?')) {
+        adminState.pages.splice(index, 1);
+        renderAdminPages();
+        saveAllData();
+        showAdminToast('🗑️ Página excluída!', 'error');
+    }
+}
+
 function renderAdminPages() {
     const container = document.getElementById('adminPagesList');
     
@@ -877,23 +1085,14 @@ function renderAdminPages() {
                 </div>
             </div>
             <div class="admin-product-actions">
-                <button class="btn-icon btn-delete" onclick="deletePage(${index})">🗑️</button>
+                <button class="btn-icon btn-delete" onclick="deletePage(${index})" title="Excluir">🗑️</button>
             </div>
         </div>
     `).join('');
 }
 
-function deletePage(index) {
-    if (confirm('Excluir esta página?')) {
-        adminState.pages.splice(index, 1);
-        renderAdminPages();
-        saveAllData();
-        showAdminToast('🗑️ Página excluída!', 'error');
-    }
-}
-
 // ============================================
-// SETTINGS
+// CONFIGURAÇÕES (ADMIN)
 // ============================================
 
 function loadSettingsToForm() {
@@ -906,14 +1105,8 @@ function loadSettingsToForm() {
     document.getElementById('editBgColor2').value = adminState.settings.bgColor2;
 }
 
-function applySettingsPreview() {
-    const root = document.documentElement;
-    root.style.setProperty('--primary', document.getElementById('editPrimaryColor').value);
-    document.body.style.background = 
-        `linear-gradient(135deg, ${document.getElementById('editBgColor1').value}, ${document.getElementById('editBgColor2').value})`;
-}
-
 function applyAllSettings() {
+    // Atualizar estado
     adminState.settings.storeName = document.getElementById('editStoreName').value;
     adminState.settings.slogan = document.getElementById('editSlogan').value;
     adminState.settings.heroDescription = document.getElementById('editHeroDescription').value;
@@ -922,14 +1115,26 @@ function applyAllSettings() {
     adminState.settings.bgColor1 = document.getElementById('editBgColor1').value;
     adminState.settings.bgColor2 = document.getElementById('editBgColor2').value;
     
-    // Aplicar ao site
-    document.querySelector('.logo').textContent = adminState.settings.storeName;
-    document.querySelector('.hero h1').textContent = '🚀 ' + adminState.settings.slogan;
-    document.querySelector('.hero p').textContent = adminState.settings.heroDescription;
+    // Aplicar cores
+    const root = document.documentElement;
+    root.style.setProperty('--primary', adminState.settings.primaryColor);
+    root.style.setProperty('--secondary', adminState.settings.secondaryColor);
+    document.body.style.background = 
+        `linear-gradient(135deg, ${adminState.settings.bgColor1}, ${adminState.settings.bgColor2})`;
+    
+    // Aplicar textos
+    document.getElementById('storeNameDisplay').textContent = adminState.settings.storeName;
+    document.getElementById('footerStoreName').textContent = adminState.settings.storeName;
+    document.getElementById('heroTitle').textContent = '🚀 ' + adminState.settings.slogan;
+    document.getElementById('heroDescription').textContent = adminState.settings.heroDescription;
+    document.title = adminState.settings.storeName + ' - Hardware & Tecnologia';
+    
+    saveAllData();
+    showAdminToast('🎨 Aparência atualizada!', 'success');
 }
 
 // ============================================
-// UTILITÁRIOS
+// UTILITÁRIOS DO ADMIN
 // ============================================
 
 function closeModal(modalId) {
@@ -938,6 +1143,8 @@ function closeModal(modalId) {
 
 function showAdminToast(message, type = 'info') {
     const toast = document.getElementById('adminToast');
+    if (!toast) return;
+    
     toast.textContent = message;
     toast.className = `admin-toast show ${type}`;
     
@@ -948,6 +1155,7 @@ function showAdminToast(message, type = 'info') {
 
 function saveAllData() {
     localStorage.setItem('bestforge_products', JSON.stringify(products));
+    localStorage.setItem('bestforge_cart', JSON.stringify(cart));
     saveAdminData();
     updateDashboardStats();
     showAdminToast('💾 Tudo salvo com sucesso!', 'success');
@@ -970,32 +1178,27 @@ function exportData() {
     a.click();
     URL.revokeObjectURL(url);
     
-    showAdminToast('📥 Dados exportados!', 'success');
+    showAdminToast('📥 Dados exportados com sucesso!', 'success');
 }
 
-function setupDragAndDrop() {
-    const items = document.querySelectorAll('.admin-product-item[draggable]');
-    
-    items.forEach(item => {
-        item.addEventListener('dragstart', function(e) {
-            this.classList.add('dragging');
-            e.dataTransfer.setData('text/plain', this.dataset.productId);
-        });
-        
-        item.addEventListener('dragend', function() {
-            this.classList.remove('dragging');
-        });
-        
-        item.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            this.closest('.admin-product-item')?.classList.add('drag-over');
-        });
-        
-        item.addEventListener('dragleave', function() {
-            this.closest('.admin-product-item')?.classList.remove('drag-over');
-        });
-    });
-}
+// ============================================
+// DEBUG & CONSOLE
+// ============================================
 
-// Inicializar Admin
-initAdmin();
+console.log('📦 BESTFORGE - Sistema completo carregado!');
+console.log('🛒 Site: ' + products.length + ' produtos disponíveis');
+console.log('⚙️ Admin: Clique no botão ⚙️ para gerenciar');
+
+// Expor funções úteis globalmente
+window.cart = cart;
+window.products = products;
+window.adminState = adminState;
+window.help = function() {
+    console.log('🛟 Comandos disponíveis:');
+    console.log('  cart - Ver carrinho');
+    console.log('  products - Ver todos produtos');
+    console.log('  adminState - Ver estado do admin');
+    console.log('  toggleAdmin() - Abrir/fechar painel admin');
+    console.log('  addToCart(id) - Adicionar produto ao carrinho');
+    console.log('  filterByCategory("GPU") - Filtrar produtos');
+};
