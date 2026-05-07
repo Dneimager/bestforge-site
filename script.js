@@ -1,97 +1,152 @@
-// 1. FUNÇÃO PARA APLICAR AS CORES DO TEMA (VINCULADA AO SEU HTML)
-function applyAllSettings() {
-    const primary = getValue('editPrimaryColor');
-    const secondary = getValue('editSecondaryColor');
-    const bg1 = getValue('editBgColor1');
-    const bg2 = getValue('editBgColor2');
-    const storeName = getValue('editStoreName');
+var products = [
+    { id: 1, name: 'RTX 4090', category: 'GPU', price: 12999.99, image: '', icon: '🎮', description: 'Placa de video top', stock: 15 },
+    { id: 2, name: 'Ryzen 9 7950X', category: 'CPU', price: 4599.99, image: '', icon: '💻', description: 'Processador 16 nucleos', stock: 25 }
+];
 
-    // Aplica as cores como variáveis no root do CSS
-    document.documentElement.style.setProperty('--primary-color', primary);
-    document.documentElement.style.setProperty('--secondary-color', secondary);
-    
-    // Atualiza os textos do site na hora
-    if(storeName) {
-        document.getElementById('storeNameDisplay').textContent = storeName;
-        document.getElementById('footerStoreName').textContent = storeName;
-    }
+var cart = [];
+var currentCategory = 'all';
+var activeEditId = null;
 
-    showAdminToast('🎨 Visual atualizado!', 'success');
-    saveData();
-}
-
-// 2. AJUSTE NA FUNÇÃO DE SALVAR PRODUTO (PARA EDITAR OU CRIAR)
-function saveProduct() {
-    var name = getValue('editProductName').trim();
-    var category = getValue('editProductCategory');
-    var price = parseFloat(getValue('editProductPrice'));
-    
-    // Pegamos o título do modal para saber se é edição ou novo
-    var isEdit = document.getElementById('modalTitle').textContent.includes('Editar');
-    var currentId = isEdit ? parseInt(activeEditId) : (Math.max(...products.map(p => p.id), 0) + 1);
-
-    if (!name || !category || !price) {
-        showAdminToast('❌ Preencha os campos obrigatórios!', 'error');
-        return;
-    }
-
-    var badge = getValue('editProductBadge');
-    var badgeTexts = { 'sale': 'OFERTA', 'new': 'NOVO', 'hot': 'DESTAQUE' };
-
-    var productData = {
-        id: currentId,
-        name: name,
-        category: category,
-        price: price,
-        oldPrice: parseFloat(getValue('editProductOldPrice')) || null,
-        description: getValue('editProductDescription').trim(),
-        icon: getValue('editProductIcon') || '📦',
-        image: getValue('editProductImage'), // Adicione esse campo no seu modal se quiser usar links de imagens/renders
-        badge: badge || null,
-        badgeText: badgeTexts[badge] || '',
-        stock: parseInt(getValue('editProductStock')) || 0,
-        rating: parseFloat(getValue('editProductRating')) || 5.0
-    };
-
-    if (isEdit) {
-        // Atualiza o produto existente
-        var index = products.findIndex(p => p.id === currentId);
-        products[index] = productData;
-    } else {
-        // Adiciona novo
-        products.push(productData);
-    }
-
-    closeModal('productModal');
-    renderAdminProducts();
+window.onload = function() {
+    loadData();
     renderProducts(products);
-    saveData();
-    updateDashboardStats();
-    showAdminToast(isEdit ? '✏️ Produto atualizado!' : '✅ Produto cadastrado!', 'success');
+    setupButtons();
+    setupAdmin();
+    updateCartUI();
+};
+
+function loadData() {
+    var saved = localStorage.getItem('bestforge_products');
+    if (saved) products = JSON.parse(saved);
 }
 
-// Variável global para controle de edição
-var activeEditId = null; 
+function saveData() {
+    localStorage.setItem('bestforge_products', JSON.stringify(products));
+}
 
-// 3. AJUSTE NA FUNÇÃO DE ABRIR O MODAL
-function openProductModal(productId) {
-    var modal = document.getElementById('productModal');
-    if (!modal) return;
+function setupButtons() {
+    document.getElementById('cartBtn').onclick = toggleCart;
+    document.getElementById('closeCart').onclick = toggleCart;
+    document.getElementById('adminFab').onclick = toggleAdmin;
+    document.getElementById('btnExitAdmin').onclick = toggleAdmin;
+    document.getElementById('btnAddProduct').onclick = () => openProductModal(null);
+    document.getElementById('btnSaveProduct').onclick = saveProduct;
     
-    activeEditId = productId; // Guarda o ID que está sendo editado
-    var title = document.getElementById('modalTitle');
+    // Filtro de categorias
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.onclick = function() {
+            currentCategory = this.getAttribute('data-category');
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            filterProducts();
+        };
+    });
+}
+
+function renderProducts(list) {
+    var grid = document.getElementById('productsGrid');
+    if (!grid) return;
+    grid.innerHTML = list.map(p => `
+        <div class="product-card">
+            <div class="product-image">
+                ${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `<span>${p.icon}</span>`}
+            </div>
+            <div class="product-info">
+                <small>${p.category}</small>
+                <h3>${p.name}</h3>
+                <p>${p.description}</p>
+                <div class="product-price">R$ ${p.price.toFixed(2)}</div>
+                <button onclick="addToCart(${p.id})">🛒 Adicionar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openProductModal(id) {
+    activeEditId = id;
+    const modal = document.getElementById('productModal');
+    const title = document.getElementById('modalTitle');
     
-    if (productId) {
-        var p = products.find(prod => prod.id === productId);
-        title.textContent = '✏️ Editar Produto';
+    if (id) {
+        const p = products.find(prod => prod.id === id);
+        title.textContent = "✏️ Editar Produto";
         setValue('editProductName', p.name);
         setValue('editProductCategory', p.category);
+        setValue('editProductImage', p.image || '');
         setValue('editProductIcon', p.icon);
         setValue('editProductPrice', p.price);
-        // ... preencha os outros campos da mesma forma ...
+        setValue('editProductDescription', p.description);
     } else {
-        title.textContent = '➕ Novo Produto';
-        // ... limpa os campos para novo produto ...
+        title.textContent = "➕ Novo Produto";
+        ['editProductName','editProductImage','editProductIcon','editProductPrice','editProductDescription'].forEach(i => setValue(i, ''));
     }
     modal.classList.add('active');
+}
+
+function saveProduct() {
+    const pData = {
+        id: activeEditId || Date.now(),
+        name: getValue('editProductName'),
+        category: getValue('editProductCategory'),
+        image: getValue('editProductImage'),
+        icon: getValue('editProductIcon') || '📦',
+        price: parseFloat(getValue('editProductPrice')) || 0,
+        description: getValue('editProductDescription')
+    };
+
+    if (activeEditId) {
+        const index = products.findIndex(p => p.id === activeEditId);
+        products[index] = pData;
+    } else {
+        products.push(pData);
+    }
+
+    saveData();
+    renderProducts(products);
+    renderAdminProducts();
+    closeModal('productModal');
+    showAdminToast("Salvo com sucesso!");
+}
+
+function renderAdminProducts() {
+    const list = document.getElementById('adminProductsList');
+    list.innerHTML = products.map(p => `
+        <div class="admin-product-item" style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
+            <span>${p.icon} ${p.name}</span>
+            <div>
+                <button onclick="openProductModal(${p.id})">✏️</button>
+                <button onclick="deleteProduct(${p.id})">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function deleteProduct(id) {
+    if(confirm("Excluir?")) {
+        products = products.filter(p => p.id !== id);
+        saveData();
+        renderProducts(products);
+        renderAdminProducts();
+    }
+}
+
+function applyAllSettings() {
+    const color = getValue('editPrimaryColor');
+    const name = getValue('editStoreName');
+    document.documentElement.style.setProperty('--primary-color', color);
+    if(name) document.getElementById('storeNameDisplay').textContent = name;
+    showAdminToast("Aparência atualizada!");
+}
+
+// Helpers
+function toggleAdmin() { document.getElementById('adminPanel').classList.toggle('active'); renderAdminProducts(); }
+function toggleCart() { document.getElementById('cartModal').classList.toggle('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function setValue(id, v) { document.getElementById(id).value = v; }
+function getValue(id) { return document.getElementById(id).value; }
+function showAdminToast(m) { alert(m); } // Simplificado para o exemplo
+function updateCartUI() { /* Lógica de UI do carrinho aqui */ }
+function filterProducts() {
+    const filtered = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
+    renderProducts(filtered);
 }
