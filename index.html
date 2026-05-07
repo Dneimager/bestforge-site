@@ -16,10 +16,7 @@
                 <span id="storeNameDisplay">BESTFORGE</span>
             </a>
             <div class="header-actions">
-                <button class="ai-chat-btn" id="aiChatBtn" title="Assistente AI">🤖</button>
-                <button class="cart-btn" id="cartBtn">
-                    🛒 Carrinho <span class="cart-count" id="cartCount">0</span>
-                </button>
+                <button class="cart-btn" onclick="toggleCart()">🛒 Carrinho <span id="cartCount">0</span></button>
             </div>
         </div>
     </header>
@@ -27,101 +24,81 @@
     <!-- Hero Section -->
     <section class="hero">
         <h1 id="heroTitle">🚀 Hardware de Alta Performance</h1>
-        <p id="heroDescription">Os melhores componentes para seu setup gamer e workstation profissional</p>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Buscar produtos...">
-            <button id="searchBtn">🔍 Buscar</button>
-        </div>
+        <p id="heroDescription">Os melhores componentes para seu setup gamer.</p>
     </section>
 
-    <!-- Products Section -->
+    <!-- Site Normal -->
     <section class="products-container">
-        <h2 class="section-title">✨ Produtos em Destaque</h2>
-        <div class="categories" id="categoriesContainer">
-            <button class="category-btn active" data-category="all">Todos</button>
-            <button class="category-btn" data-category="GPU">GPU</button>
-            <button class="category-btn" data-category="CPU">CPU</button>
-            <button class="category-btn" data-category="RAM">RAM</button>
-            <button class="category-btn" data-category="Storage">Armazenamento</button>
+        <div class="categories">
+            <button class="category-btn active" onclick="filterProducts('all', this)">Todos</button>
+            <button class="category-btn" onclick="filterProducts('GPU', this)">GPU</button>
+            <button class="category-btn" onclick="filterProducts('CPU', this)">CPU</button>
         </div>
         <div class="products-grid" id="productsGrid"></div>
     </section>
 
-    <!-- Modais do Cliente (Carrinho, AI) -->
-    <div class="cart-overlay" id="cartOverlay"></div>
-    <div class="cart-modal" id="cartModal">
-        <div class="cart-header"><h2>🛒 Seu Carrinho</h2><button class="close-cart" id="closeCart">✕</button></div>
-        <div class="cart-items" id="cartItems"><p class="empty-cart">Carrinho vazio</p></div>
-        <div class="cart-total"><span>Total:</span><span id="cartTotal">R$ 0,00</span></div>
-        <button class="checkout-btn" id="checkoutBtn">Finalizar Compra 💳</button>
-    </div>
-
-    <!-- PAINEL ADMINISTRATIVO -->
-    <div class="admin-fab" id="adminFab" title="Painel Administrativo"><span class="admin-fab-icon">⚙️</span></div>
-    <div class="admin-overlay" id="adminOverlay"></div>
+    <!-- PAINEL ADMINISTRATIVO (LATERAL) -->
+    <div class="admin-fab" id="adminFab" onclick="toggleAdmin()">⚙️</div>
+    <div class="admin-overlay" id="adminOverlay" onclick="toggleAdmin()"></div>
+    
     <div class="admin-panel" id="adminPanel">
         <div class="admin-sidebar">
-            <div class="admin-logo"><span>⚡</span><span>Admin</span></div>
+            <h2>⚙️ Painel Admin</h2>
             <nav class="admin-nav">
-                <a href="#" class="admin-nav-item active" data-tab="dashboard">📊 Dashboard</a>
-                <a href="#" class="admin-nav-item" data-tab="products">📦 Produtos</a>
-                <a href="#" class="admin-nav-item" data-tab="settings">🎨 Aparência</a>
+                <button onclick="switchTab('dashboard')">📊 Dashboard</button>
+                <button onclick="switchTab('products')">📦 Produtos</button>
+                <button onclick="switchTab('settings')">🎨 Aparência</button>
             </nav>
-            <button class="btn-exit-admin" id="btnExitAdmin">🚪 Sair</button>
+            <button class="btn-exit" onclick="toggleAdmin()">🚪 Sair</button>
         </div>
         
         <div class="admin-main">
-            <div class="admin-main-header"><h2 id="adminTabTitle">📊 Dashboard</h2></div>
-            <div class="admin-content">
-                <!-- Tab Dashboard -->
-                <div class="admin-tab active" id="tab-dashboard">
-                    <div class="stats-grid">
-                        <div class="stat-card">📦 <span id="statProducts">0</span> Produtos</div>
-                    </div>
-                </div>
+            <!-- Tab Dashboard -->
+            <div id="tab-dashboard" class="admin-tab active">
+                <h3>Resumo</h3>
+                <p>Total de Produtos: <span id="statProducts">0</span></p>
+            </div>
 
-                <!-- Tab Produtos -->
-                <div class="admin-tab" id="tab-products">
-                    <button class="btn-add" id="btnAddProduct">➕ Novo Produto</button>
-                    <div class="products-admin-list" id="adminProductsList"></div>
-                </div>
+            <!-- Tab Produtos -->
+            <div id="tab-products" class="admin-tab">
+                <button class="btn-add" onclick="openProductModal(null)">➕ Adicionar Produto</button>
+                <div id="adminProductsList"></div>
+            </div>
 
-                <!-- Tab Aparência -->
-                <div class="admin-tab" id="tab-settings">
-                    <h3>🎨 Cores e Textos</h3>
-                    <input type="color" id="editPrimaryColor" value="#6c5ce7"> Cor Primária
-                    <input type="text" id="editStoreName" placeholder="Nome da Loja">
-                    <button class="btn-save" onclick="applyAllSettings()">Aplicar Mudanças</button>
-                </div>
+            <!-- Tab Aparência -->
+            <div id="tab-settings" class="admin-tab">
+                <h3>Customizar Site</h3>
+                <label>Cor do Tema:</label>
+                <input type="color" id="editPrimaryColor" onchange="applySettings()">
+                <label>Nome da Loja:</label>
+                <input type="text" id="editStoreName" oninput="applySettings()">
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE PRODUTO -->
+    <!-- MODAL DE EDIÇÃO (O EDITOR) -->
     <div class="modal" id="productModal">
         <div class="modal-content">
-            <div class="modal-header"><h3 id="modalTitle">Produto</h3><button class="modal-close" onclick="closeModal('productModal')">✕</button></div>
+            <h3 id="modalTitle">Novo Produto</h3>
             <div class="modal-body">
-                <label>Nome</label><input type="text" id="editProductName">
-                <label>Categoria</label>
+                <label>Nome:</label><input type="text" id="editProductName">
+                <label>Categoria:</label>
                 <select id="editProductCategory">
-                    <option value="GPU">GPU</option><option value="CPU">CPU</option>
-                    <option value="RAM">RAM</option><option value="Storage">Armazenamento</option>
+                    <option value="GPU">GPU</option>
+                    <option value="CPU">CPU</option>
                 </select>
-                <label>URL da Imagem (Render)</label><input type="text" id="editProductImage" placeholder="http://...">
-                <label>Emoji (Icone Reserva)</label><input type="text" id="editProductIcon">
-                <label>Preço</label><input type="number" id="editProductPrice">
-                <label>Descrição</label><textarea id="editProductDescription"></textarea>
+                <label>URL da Imagem (Render):</label><input type="text" id="editProductImage">
+                <label>Emoji (Ícone):</label><input type="text" id="editProductIcon">
+                <label>Preço:</label><input type="number" id="editProductPrice">
+                <label>Descrição:</label><textarea id="editProductDescription"></textarea>
             </div>
             <div class="modal-footer">
-                <button onclick="closeModal('productModal')">Cancelar</button>
-                <button class="btn-save" id="btnSaveProduct">💾 Salvar Produto</button>
+                <button onclick="closeModal()">Cancelar</button>
+                <button class="btn-save" onclick="saveProduct()">💾 Salvar</button>
             </div>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
-    <div class="admin-toast" id="adminToast"></div>
     <script src="script.js"></script>
 </body>
 </html>
