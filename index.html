@@ -105,14 +105,14 @@
         </div>
     </footer>
 
-    <!-- PAINEL DE GESTÃO (RESTAURO) -->
+    <!-- PAINEL DE GESTÃO -->
     <button onclick="toggleAdmin()" class="fixed bottom-10 right-10 w-16 h-16 bg-slate-900 text-white rounded-3xl shadow-2xl z-[60] border-2 border-indigo-600/20 text-center">⚙️</button>
 
     <div id="adminOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden z-[70]" onclick="toggleAdmin()"></div>
     <aside id="adminPanel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-[80] transition-transform duration-500 translate-x-full overflow-hidden flex flex-col text-left">
-        <div class="p-8 border-b flex justify-between items-center bg-slate-50">
-            <h2 class="font-black text-xl uppercase italic text-slate-800">Gestão</h2>
-            <button onclick="toggleAdmin()" class="text-slate-400">✕</button>
+        <div class="p-8 border-b flex justify-between items-center bg-slate-50 text-left">
+            <h2 class="font-black text-xl uppercase italic text-slate-800 text-left">Gestão</h2>
+            <button onclick="toggleAdmin()" class="text-slate-400 p-2">✕</button>
         </div>
         
         <div class="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-10 text-left">
@@ -124,36 +124,36 @@
             </div>
 
             <!-- Aba Produtos -->
-            <div id="adminTabProducts" class="space-y-6">
+            <div id="adminTabProducts" class="space-y-6 text-left">
                 <button onclick="openEditor(null)" class="w-full py-5 border-2 border-dashed border-indigo-200 rounded-2xl text-indigo-600 font-black hover:border-indigo-500 transition uppercase tracking-widest italic text-center">+ NOVO ITEM</button>
-                <div id="adminProductList" class="space-y-3"></div>
+                <div id="adminProductList" class="space-y-3 text-left"></div>
             </div>
 
             <!-- Aba Categorias -->
-            <div id="adminTabCategories" class="hidden space-y-6">
-                <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
-                    <label class="block text-[10px] font-black text-indigo-600 uppercase mb-3 tracking-widest">Nova Categoria</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="inpNewCategory" placeholder="NOME..." class="flex-1 px-4 py-2 rounded-xl border-none font-bold uppercase text-sm">
-                        <button onclick="addCategory()" class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg">Add</button>
+            <div id="adminTabCategories" class="hidden space-y-6 text-left">
+                <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100 text-left">
+                    <label class="block text-[10px] font-black text-indigo-600 uppercase mb-3 tracking-widest text-left">Nova Categoria</label>
+                    <div class="flex gap-2 text-left">
+                        <input type="text" id="inpNewCategory" placeholder="NOME..." class="flex-1 px-4 py-2 rounded-xl border-none font-bold uppercase text-sm text-left">
+                        <button onclick="addCategory()" class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg text-center">Add</button>
                     </div>
                 </div>
-                <div id="adminCategoryList" class="space-y-2"></div>
+                <div id="adminCategoryList" class="space-y-2 text-left"></div>
             </div>
 
             <!-- Aba Aparência -->
-            <div id="adminTabAppearance" class="hidden space-y-8">
+            <div id="adminTabAppearance" class="hidden space-y-8 text-left">
                 <div class="text-left">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Branding da Loja</label>
-                    <input type="text" id="inpStoreName" placeholder="Nome da Loja" class="w-full px-5 py-4 rounded-xl bg-slate-50 border-none outline-none mb-3 font-bold text-slate-800" oninput="saveAppearance()">
-                    <input type="text" id="inpStoreHero" placeholder="Slogan Principal" class="w-full px-5 py-4 rounded-xl bg-slate-50 border-none outline-none font-bold text-slate-800" oninput="saveAppearance()">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest text-left">Branding da Loja</label>
+                    <input type="text" id="inpStoreName" placeholder="Nome da Loja" class="w-full px-5 py-4 rounded-xl bg-slate-50 border-none outline-none mb-3 font-bold text-slate-800 text-left" oninput="saveAppearance()">
+                    <input type="text" id="inpStoreHero" placeholder="Slogan Principal" class="w-full px-5 py-4 rounded-xl bg-slate-50 border-none outline-none font-bold text-slate-800 text-left" oninput="saveAppearance()">
                 </div>
                 <p class="text-[10px] text-slate-400 uppercase font-bold text-center italic">Configurações salvas automaticamente na nuvem.</p>
             </div>
         </div>
     </aside>
 
-    <!-- Modal do Editor (Restauro do Design Completo) -->
+    <!-- Modal do Editor -->
     <div id="editorModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-xl">
         <div class="bg-white w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col text-left">
             <div class="p-8 border-b flex justify-between items-center font-black uppercase italic text-left">
@@ -161,42 +161,42 @@
                 <button onclick="closeEditor()" class="text-slate-400">✕</button>
             </div>
             <div class="p-10 overflow-y-auto max-h-[75vh] space-y-6 custom-scrollbar text-left">
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Nome do Produto</label>
-                    <input type="text" id="edtName" placeholder="Ex: Chaveiro Polvinho" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold uppercase italic text-slate-800">
+                <div class="text-left">
+                    <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block text-left">Nome do Produto</label>
+                    <input type="text" id="edtName" placeholder="Ex: Chaveiro Polvinho" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold uppercase italic text-slate-800 text-left">
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Categoria</label>
-                        <select id="edtCategory" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800"></select>
+                <div class="grid grid-cols-2 gap-4 text-left">
+                    <div class="text-left">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block text-left">Categoria</label>
+                        <select id="edtCategory" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800 text-left"></select>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Preço R$</label>
-                        <input type="number" id="edtPrice" placeholder="0.00" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800">
+                    <div class="text-left">
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block text-left">Preço R$</label>
+                        <input type="number" id="edtPrice" placeholder="0.00" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800 text-left">
                     </div>
                 </div>
 
-                <div>
-                    <div class="flex justify-between mb-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase">Descrição</label>
-                        <button onclick="optimizeDescriptionAI()" class="text-[9px] bg-indigo-600 text-white px-3 py-1 rounded-full font-black uppercase shadow-md">✨ IA</button>
+                <div class="text-left">
+                    <div class="flex justify-between mb-1 text-left">
+                        <label class="text-[10px] font-black text-slate-400 uppercase text-left">Descrição</label>
+                        <button onclick="optimizeDescriptionAI()" class="text-[9px] bg-indigo-600 text-white px-3 py-1 rounded-full font-black uppercase shadow-md text-center">✨ IA</button>
                     </div>
-                    <textarea id="edtDescription" placeholder="Detalhes técnicos..." class="w-full p-5 bg-slate-50 rounded-xl h-32 outline-none text-slate-700"></textarea>
+                    <textarea id="edtDescription" placeholder="Detalhes técnicos..." class="w-full p-5 bg-slate-50 rounded-xl h-32 outline-none text-slate-700 text-left"></textarea>
                 </div>
 
-                <div class="p-5 bg-indigo-50 rounded-3xl border-2 border-dashed border-indigo-100">
+                <div class="p-5 bg-indigo-50 rounded-3xl border-2 border-dashed border-indigo-100 text-left">
                     <label class="text-[10px] font-black text-indigo-600 uppercase mb-2 block text-center">Foto do Produto</label>
-                    <label for="edtFile" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase cursor-pointer text-center block shadow-lg hover:bg-indigo-700 transition">📁 Selecionar do PC</label>
+                    <label for="edtFile" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase cursor-pointer text-center block shadow-lg hover:bg-indigo-700 transition text-center">📁 Selecionar do PC</label>
                     <input type="file" id="edtFile" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
-                    <div id="imagePreview" class="mt-4 h-32 flex items-center justify-center bg-white rounded-xl overflow-hidden border border-indigo-50">
+                    <div id="imagePreview" class="mt-4 h-32 flex items-center justify-center bg-white rounded-xl overflow-hidden border border-indigo-50 text-center">
                         <span class="text-slate-300 text-[10px] font-black uppercase text-center">Preview</span>
                     </div>
                 </div>
             </div>
             <div class="p-8 bg-slate-50 flex gap-4 text-center">
-                <button onclick="closeEditor()" class="flex-1 font-black text-slate-400 uppercase italic text-xs">Cancelar</button>
-                <button onclick="commitProduct()" id="btnSave" class="flex-[3] bg-indigo-600 text-white py-5 rounded-3xl font-black shadow-xl hover:bg-indigo-700 transition uppercase italic">Gravar na Nuvem</button>
+                <button onclick="closeEditor()" class="flex-1 font-black text-slate-400 uppercase italic text-xs text-center">Cancelar</button>
+                <button onclick="commitProduct()" id="btnSave" class="flex-[3] bg-indigo-600 text-white py-5 rounded-3xl font-black shadow-xl hover:bg-indigo-700 transition uppercase italic text-center">Gravar na Nuvem</button>
             </div>
         </div>
     </div>
@@ -226,7 +226,7 @@
 
         // CARREGAMENTO DE DADOS
         async function loadProducts() {
-            const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
+            const { data } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
             if (data) { products = data; renderSite(); }
         }
 
@@ -235,6 +235,7 @@
             if (data) { 
                 categories = data.map(c => c.name); 
                 renderCategoryFilters(); 
+                renderAdminLists(); // Garante que a lista admin de categorias atualize
             } else {
                 categories = ['GERAL', 'FILAMENTOS', 'RESINAS'];
             }
@@ -242,10 +243,7 @@
 
         async function loadAppearance() {
             const { data } = await supabaseClient.from('appearance').select('*').eq('id', 1).single();
-            if (data) {
-                appearance = data;
-                applyAppearance();
-            }
+            if (data) { appearance = data; applyAppearance(); }
         }
 
         // RENDERS VISUAIS
@@ -260,7 +258,7 @@
                             ${p.image ? `<img src="${p.image}">` : `<span class="text-4xl opacity-20">🏗️</span>`}
                         </div>
                         <div class="px-2 text-left">
-                            <span class="text-[8px] font-black text-indigo-500 uppercase tracking-widest mb-1 block">${p.category || 'GERAL'}</span>
+                            <span class="text-[8px] font-black text-indigo-50 uppercase tracking-widest mb-1 block">${p.category || 'GERAL'}</span>
                             <h4 class="font-black text-slate-900 text-sm mb-3 uppercase italic line-clamp-1 text-slate-800">${p.name}</h4>
                             <div class="flex justify-between items-end">
                                 <span class="text-lg font-black text-slate-900 tracking-tighter italic">R$ ${p.price.toLocaleString()}</span>
@@ -276,20 +274,20 @@
         function renderCategoryFilters() {
             const tabs = document.getElementById('mainCategoryTabs');
             if(!tabs) return;
-            let html = `<button onclick="filterAll('all', this)" class="cat-btn px-10 py-4 rounded-2xl bg-indigo-600 text-white font-black shadow-xl transition uppercase text-[10px] tracking-widest italic">Tudo</button>`;
+            let html = `<button onclick="filterAll('all', this)" class="cat-btn px-10 py-4 rounded-2xl bg-indigo-600 text-white font-black shadow-xl transition uppercase text-[10px] tracking-widest italic text-center">Tudo</button>`;
             categories.forEach(cat => {
-                html += `<button onclick="filterAll('${cat}', this)" class="cat-btn px-10 py-4 rounded-2xl bg-white text-slate-500 border border-slate-100 font-black hover:border-indigo-600 transition uppercase text-[10px] tracking-widest italic">${cat}</button>`;
+                html += `<button onclick="filterAll('${cat}', this)" class="cat-btn px-10 py-4 rounded-2xl bg-white text-slate-500 border border-slate-100 font-black hover:border-indigo-600 transition uppercase text-[10px] tracking-widest italic text-center">${cat}</button>`;
             });
             tabs.innerHTML = html;
         }
 
         function renderAdminLists() {
-            // Lista de Produtos no Admin (COM ÍCONES IGUAL À IMAGEM)
+            // Lista de Produtos no Admin
             document.getElementById('adminProductList').innerHTML = products.map(p => `
                 <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 text-left">
                         <span class="text-xl">${p.icon || '📦'}</span>
-                        <span class="font-bold text-[10px] uppercase italic truncate w-32 text-slate-800">${p.name}</span>
+                        <span class="font-bold text-[10px] uppercase italic truncate w-32 text-slate-800 text-left">${p.name}</span>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="openEditor(${p.id})" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 border border-slate-100 hover:bg-indigo-50">✏️</button>
@@ -298,11 +296,11 @@
                 </div>
             `).join('');
 
-            // Lista de Categorias
+            // Lista de Categorias no Admin (COM BOTÃO APAGAR)
             document.getElementById('adminCategoryList').innerHTML = categories.map(cat => `
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span class="font-black text-[10px] uppercase italic text-slate-700">${cat}</span>
-                    <button onclick="removeCategory('${cat}')" class="text-red-400 hover:text-red-600">🗑️</button>
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
+                    <span class="font-black text-[10px] uppercase italic text-slate-700 text-left">${cat}</span>
+                    <button onclick="removeCategory('${cat}')" class="p-2 bg-white rounded-xl shadow-sm text-red-400 border border-slate-100 hover:bg-red-50 transition text-center">🗑️</button>
                 </div>
             `).join('');
         }
@@ -336,16 +334,14 @@
                 document.getElementById('edtName').value = "";
                 document.getElementById('edtPrice').value = "";
                 document.getElementById('edtDescription').value = "";
-                document.getElementById('imagePreview').innerHTML = '<span class="text-slate-300 text-[10px] font-black uppercase">Preview</span>';
+                document.getElementById('imagePreview').innerHTML = '<span class="text-slate-300 text-[10px] font-black uppercase text-center">Preview</span>';
                 currentBase64Image = "";
             }
         }
 
         async function commitProduct() {
             const btn = document.getElementById('btnSave');
-            btn.textContent = "GRAVANDO...";
-            btn.disabled = true;
-
+            btn.textContent = "GRAVANDO..."; btn.disabled = true;
             const product = {
                 name: document.getElementById('edtName').value,
                 category: document.getElementById('edtCategory').value,
@@ -353,37 +349,24 @@
                 description: document.getElementById('edtDescription').value,
                 image: currentBase64Image
             };
-
-            let res;
-            if(currentEditorId) {
-                res = await supabaseClient.from('products').update(product).eq('id', currentEditorId);
-            } else {
-                res = await supabaseClient.from('products').insert([product]);
-            }
-            
-            btn.textContent = "Gravar na Nuvem";
-            btn.disabled = false;
-
-            if (!res.error) {
-                showToast("DADOS SINCRONIZADOS!");
-                closeEditor();
-                loadProducts();
-            } else { showToast("ERRO CLOUD!"); }
+            let res = currentEditorId ? await supabaseClient.from('products').update(product).eq('id', currentEditorId) : await supabaseClient.from('products').insert([product]);
+            btn.textContent = "Gravar na Nuvem"; btn.disabled = false;
+            if (!res.error) { showToast("SINCRONIZADO!"); closeEditor(); loadProducts(); } else { showToast("ERRO CLOUD!"); }
         }
 
         // CATEGORIAS E APARÊNCIA CLOUD
         async function addCategory() {
             const name = document.getElementById('inpNewCategory').value.trim().toUpperCase();
             if(!name) return;
-            await supabaseClient.from('categories').insert([{ name }]);
-            document.getElementById('inpNewCategory').value = "";
-            loadCategories();
+            const { error } = await supabaseClient.from('categories').insert([{ name }]);
+            if(!error) { document.getElementById('inpNewCategory').value = ""; await loadCategories(); showToast("CATEGORIA ADICIONADA!"); }
+            else { showToast("CATEGORIA JÁ EXISTE!"); }
         }
 
         async function removeCategory(name) {
-            if(confirm("Apagar categoria?")) {
-                await supabaseClient.from('categories').delete().eq('name', name);
-                loadCategories();
+            if(confirm(`Tem certeza que deseja apagar a categoria "${name}"?`)) {
+                const { error } = await supabaseClient.from('categories').delete().eq('name', name);
+                if(!error) { await loadCategories(); showToast("CATEGORIA REMOVIDA!"); }
             }
         }
 
@@ -422,9 +405,7 @@
 
         function addToCart(id) {
             const p = products.find(i => i.id === id);
-            cart.push(p);
-            renderCart();
-            showToast("ITEM FORJADO!");
+            cart.push(p); renderCart(); showToast("ITEM FORJADO!");
         }
 
         function renderCart() {
@@ -432,8 +413,8 @@
             document.getElementById('cartItemsList').innerHTML = cart.map((p, index) => {
                 total += p.price;
                 return `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 text-left">
-                    <span class="text-[10px] font-black uppercase italic truncate w-40 text-slate-800">${p.name}</span>
-                    <button onclick="cart.splice(${index},1);renderCart();" class="text-red-400 font-black">✕</button></div>`;
+                    <span class="text-[10px] font-black uppercase italic truncate w-40 text-slate-800 text-left">${p.name}</span>
+                    <button onclick="cart.splice(${index},1);renderCart();" class="text-red-400 font-black p-2">✕</button></div>`;
             }).join('');
             document.getElementById('cartTotalDisplay').textContent = `R$ ${total.toLocaleString()}`;
             document.getElementById('cartBadge').textContent = cart.length;
@@ -468,14 +449,14 @@
             grid.innerHTML = f.map(p => `
                 <div onclick="viewProductDetail(${p.id})" class="product-card bg-white rounded-[32px] p-3 border border-slate-100 flex flex-col shadow-sm text-left">
                     <div class="img-container h-44 bg-slate-50 rounded-[24px] mb-4 flex items-center justify-center overflow-hidden text-center">
-                        ${p.image ? `<img src="${p.image}">` : `<span class="text-4xl opacity-20">🏗️</span>`}
+                        ${p.image ? `<img src="${p.image}">` : `<span class="text-4xl opacity-20 text-center">🏗️</span>`}
                     </div>
                     <div class="px-2 text-left">
                         <span class="text-[8px] font-black text-indigo-500 uppercase tracking-widest mb-1 block">${p.category || 'GERAL'}</span>
-                        <h4 class="font-black text-slate-900 text-sm mb-3 uppercase italic line-clamp-1 text-slate-800">${p.name}</h4>
+                        <h4 class="font-black text-slate-900 text-sm mb-3 uppercase italic line-clamp-1 text-slate-800 text-left">${p.name}</h4>
                         <div class="flex justify-between items-end">
                             <span class="text-lg font-black text-slate-900 tracking-tighter italic">R$ ${p.price.toLocaleString()}</span>
-                            <button onclick="event.stopPropagation(); addToCart(${p.id})" class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-indigo-600 transition">🛒</button>
+                            <button onclick="event.stopPropagation(); addToCart(${p.id})" class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-indigo-600 transition text-center">🛒</button>
                         </div>
                     </div>
                 </div>
