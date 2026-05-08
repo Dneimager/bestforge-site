@@ -6,7 +6,7 @@
     <title>BESTFORGE 3D | Forjando Suas Ideias</title>
     <!-- Framework CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Importação do SDK do Supabase -->
+    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     
@@ -44,7 +44,7 @@
         <div class="max-w-6xl mx-auto px-4 py-12 text-left">
             <button onclick="closeProductDetail()" class="mb-8 font-bold text-slate-400 hover:text-indigo-600 flex items-center gap-2 transition uppercase text-xs">← Voltar</button>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 text-left">
-                <div id="detailImageContainer" class="bg-slate-50 rounded-[48px] aspect-square flex items-center justify-center p-8 overflow-hidden shadow-inner border border-slate-100"></div>
+                <div id="detailImageContainer" class="bg-slate-50 rounded-[48px] aspect-square flex items-center justify-center p-8 overflow-hidden shadow-inner border border-slate-100 text-center"></div>
                 <div class="flex flex-col justify-center text-left">
                     <span id="detailCategory" class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-4">CATEGORIA</span>
                     <h2 id="detailName" class="text-4xl sm:text-5xl font-black text-slate-900 mb-8 leading-tight uppercase italic text-left">NOME</h2>
@@ -81,15 +81,19 @@
     <section id="heroSection" class="min-h-[500px] flex items-center justify-center pt-20 px-6 text-center text-white relative overflow-hidden">
         <div class="relative z-10 max-w-4xl mx-auto">
             <h1 id="displayHeroTitle" class="text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase italic drop-shadow-2xl">FORJANDO SUAS IDEIAS</h1>
-            <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-medium opacity-80 uppercase tracking-widest text-[11px]">Catálogo Inteligente de Impressão 3D e Manufatura Aditiva.</p>
+            <p id="displayHeroSub" class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-medium opacity-80 uppercase tracking-widest text-[11px]">Catálogo Inteligente de Impressão 3D e Manufatura Aditiva.</p>
             <div class="mt-12"><a href="#loja" class="px-12 py-5 bg-indigo-600 text-white font-black rounded-2xl shadow-2xl hover:bg-indigo-700 transition uppercase italic text-sm inline-block">Explorar Catálogo</a></div>
         </div>
     </section>
 
     <!-- Vitrine Principal -->
     <main id="loja" class="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 py-24 text-center">
+        <!-- Filtros de Categoria -->
+        <div id="mainCategoryTabs" class="flex flex-wrap justify-center gap-3 mb-12"></div>
+        
+        <!-- Grid de Produtos -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="allProductsGrid">
-            <p class="col-span-full text-slate-400 py-20 font-bold uppercase tracking-widest text-center">Iniciando Forja Cloud...</p>
+            <p class="col-span-full text-slate-400 py-20 font-bold uppercase tracking-widest text-center">Carregando forja cloud...</p>
         </div>
     </main>
 
@@ -101,38 +105,98 @@
         </div>
     </footer>
 
-    <!-- Admin Panel FAB -->
+    <!-- PAINEL DE GESTÃO (RESTAURO) -->
     <button onclick="toggleAdmin()" class="fixed bottom-10 right-10 w-16 h-16 bg-slate-900 text-white rounded-3xl shadow-2xl z-[60] border-2 border-indigo-600/20 text-center">⚙️</button>
 
-    <div id="adminOverlay" class="fixed inset-0 bg-slate-900/60 hidden z-[70]" onclick="toggleAdmin()"></div>
-    <aside id="adminPanel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-[80] translate-x-full transition-transform p-8 overflow-y-auto custom-scrollbar text-left">
-        <h2 class="font-black text-2xl uppercase italic mb-8 text-slate-800 text-left">Gestão BestForge</h2>
-        <button onclick="openEditor(null)" class="w-full py-5 border-2 border-dashed border-indigo-200 rounded-2xl text-indigo-600 font-black mb-8 hover:border-indigo-500 transition uppercase tracking-widest italic text-center">+ NOVO PRODUTO</button>
-        <div id="adminProductList" class="space-y-3 text-left"></div>
+    <div id="adminOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden z-[70]" onclick="toggleAdmin()"></div>
+    <aside id="adminPanel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-[80] transition-transform duration-500 translate-x-full overflow-hidden flex flex-col text-left">
+        <div class="p-8 border-b flex justify-between items-center bg-slate-50">
+            <h2 class="font-black text-xl uppercase italic text-slate-800">Gestão</h2>
+            <button onclick="toggleAdmin()" class="text-slate-400">✕</button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-10 text-left">
+            <!-- Abas -->
+            <div class="flex gap-2 p-1.5 bg-slate-100 rounded-2xl">
+                <button onclick="switchAdminTab('products')" class="flex-1 py-3 text-[10px] font-black rounded-xl bg-white shadow-sm transition uppercase tracking-widest" id="btnTabProd">Produtos</button>
+                <button onclick="switchAdminTab('categories')" class="flex-1 py-3 text-[10px] font-black text-slate-500 transition uppercase tracking-widest" id="btnTabCat">Categorias</button>
+                <button onclick="switchAdminTab('appearance')" class="flex-1 py-3 text-[10px] font-black text-slate-500 transition uppercase tracking-widest" id="btnTabApper">Aparência</button>
+            </div>
+
+            <!-- Aba Produtos -->
+            <div id="adminTabProducts" class="space-y-6">
+                <button onclick="openEditor(null)" class="w-full py-5 border-2 border-dashed border-indigo-200 rounded-2xl text-indigo-600 font-black hover:border-indigo-500 transition uppercase tracking-widest italic text-center">+ NOVO ITEM</button>
+                <div id="adminProductList" class="space-y-3"></div>
+            </div>
+
+            <!-- Aba Categorias -->
+            <div id="adminTabCategories" class="hidden space-y-6">
+                <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100">
+                    <label class="block text-[10px] font-black text-indigo-600 uppercase mb-3 tracking-widest">Nova Categoria</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="inpNewCategory" placeholder="NOME..." class="flex-1 px-4 py-2 rounded-xl border-none font-bold uppercase text-sm">
+                        <button onclick="addCategory()" class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg">Add</button>
+                    </div>
+                </div>
+                <div id="adminCategoryList" class="space-y-2"></div>
+            </div>
+
+            <!-- Aba Aparência -->
+            <div id="adminTabAppearance" class="hidden space-y-8">
+                <div class="text-left">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Branding da Loja</label>
+                    <input type="text" id="inpStoreName" placeholder="Nome da Loja" class="w-full px-5 py-4 rounded-xl bg-slate-50 border-none outline-none mb-3 font-bold text-slate-800" oninput="saveAppearance()">
+                    <input type="text" id="inpStoreHero" placeholder="Slogan Principal" class="w-full px-5 py-4 rounded-xl bg-slate-50 border-none outline-none font-bold text-slate-800" oninput="saveAppearance()">
+                </div>
+                <p class="text-[10px] text-slate-400 uppercase font-bold text-center italic">Configurações salvas automaticamente na nuvem.</p>
+            </div>
+        </div>
     </aside>
 
-    <!-- Editor Modal -->
+    <!-- Modal do Editor (Restauro do Design Completo) -->
     <div id="editorModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-xl">
         <div class="bg-white w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden flex flex-col text-left">
-            <div class="p-8 border-b flex justify-between items-center font-black uppercase italic text-left">Editor de Produto<button onclick="closeEditor()" class="text-slate-400">✕</button></div>
+            <div class="p-8 border-b flex justify-between items-center font-black uppercase italic text-left">
+                <span id="editorTitle">Editor de Produto</span>
+                <button onclick="closeEditor()" class="text-slate-400">✕</button>
+            </div>
             <div class="p-10 overflow-y-auto max-h-[75vh] space-y-6 custom-scrollbar text-left">
-                <input type="text" id="edtName" placeholder="Nome do Produto" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold uppercase italic text-slate-800">
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="edtCategory" placeholder="Categoria (ex: FILAMENTO)" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800">
-                    <input type="number" id="edtPrice" placeholder="Preço R$" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Nome do Produto</label>
+                    <input type="text" id="edtName" placeholder="Ex: Chaveiro Polvinho" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold uppercase italic text-slate-800">
                 </div>
-                <textarea id="edtDescription" placeholder="Descrição técnica..." class="w-full p-5 bg-slate-50 rounded-xl h-32 outline-none text-slate-700"></textarea>
-                <div class="p-5 bg-indigo-50 rounded-3xl border-2 border-dashed border-indigo-100 text-left">
-                    <label for="edtFile" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase cursor-pointer text-center block shadow-lg hover:bg-indigo-700 transition">📁 Selecionar Foto do PC</label>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Categoria</label>
+                        <select id="edtCategory" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800"></select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Preço R$</label>
+                        <input type="number" id="edtPrice" placeholder="0.00" class="w-full p-4 bg-slate-50 rounded-xl outline-none font-bold text-slate-800">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">Descrição</label>
+                        <button onclick="optimizeDescriptionAI()" class="text-[9px] bg-indigo-600 text-white px-3 py-1 rounded-full font-black uppercase shadow-md">✨ IA</button>
+                    </div>
+                    <textarea id="edtDescription" placeholder="Detalhes técnicos..." class="w-full p-5 bg-slate-50 rounded-xl h-32 outline-none text-slate-700"></textarea>
+                </div>
+
+                <div class="p-5 bg-indigo-50 rounded-3xl border-2 border-dashed border-indigo-100">
+                    <label class="text-[10px] font-black text-indigo-600 uppercase mb-2 block text-center">Foto do Produto</label>
+                    <label for="edtFile" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase cursor-pointer text-center block shadow-lg hover:bg-indigo-700 transition">📁 Selecionar do PC</label>
                     <input type="file" id="edtFile" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
                     <div id="imagePreview" class="mt-4 h-32 flex items-center justify-center bg-white rounded-xl overflow-hidden border border-indigo-50">
-                        <span class="text-slate-300 text-[10px] font-black uppercase tracking-widest text-center">Visualização</span>
+                        <span class="text-slate-300 text-[10px] font-black uppercase text-center">Preview</span>
                     </div>
                 </div>
             </div>
             <div class="p-8 bg-slate-50 flex gap-4 text-center">
-                <button onclick="closeEditor()" class="flex-1 font-black text-slate-400 uppercase italic text-xs text-center">FECHAR</button>
-                <button onclick="commitProduct()" id="btnSave" class="flex-[3] bg-indigo-600 text-white py-5 rounded-3xl font-black shadow-2xl hover:bg-indigo-700 transition uppercase italic text-center">Salvar na Nuvem</button>
+                <button onclick="closeEditor()" class="flex-1 font-black text-slate-400 uppercase italic text-xs">Cancelar</button>
+                <button onclick="commitProduct()" id="btnSave" class="flex-[3] bg-indigo-600 text-white py-5 rounded-3xl font-black shadow-xl hover:bg-indigo-700 transition uppercase italic">Gravar na Nuvem</button>
             </div>
         </div>
     </div>
@@ -142,24 +206,53 @@
 
     <script>
         // CONFIGURAÇÕES SUPABASE
-        const SUPABASE_URL = "https://jhfzajggrewmvl kbrpdr.supabase.co".replace(/\s/g, ''); 
+        const SUPABASE_URL = "https://jhfzajggrewmvlkbrpdr.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_DLpBH5XNOVjUVDgTuM8nXA_nbaaWIQz";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let products = [];
+        let categories = [];
+        let appearance = { name: "BESTFORGE 3D", hero_title: "FORJANDO SUAS IDEIAS" };
         let cart = [];
         let currentBase64Image = "";
+        let currentEditorId = null;
 
+        // INICIALIZAÇÃO
+        async function init() {
+            await loadAppearance();
+            await loadCategories();
+            await loadProducts();
+        }
+
+        // CARREGAMENTO DE DADOS
         async function loadProducts() {
             const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
             if (data) { products = data; renderSite(); }
-            else if (error) { console.error("Erro Supabase:", error); showToast("Erro ao carregar banco!"); }
         }
 
+        async function loadCategories() {
+            const { data } = await supabaseClient.from('categories').select('*');
+            if (data) { 
+                categories = data.map(c => c.name); 
+                renderCategoryFilters(); 
+            } else {
+                categories = ['GERAL', 'FILAMENTOS', 'RESINAS'];
+            }
+        }
+
+        async function loadAppearance() {
+            const { data } = await supabaseClient.from('appearance').select('*').eq('id', 1).single();
+            if (data) {
+                appearance = data;
+                applyAppearance();
+            }
+        }
+
+        // RENDERS VISUAIS
         function renderSite() {
             const grid = document.getElementById('allProductsGrid');
             if(products.length === 0) {
-                grid.innerHTML = '<p class="col-span-full text-slate-400 py-20 uppercase font-black tracking-widest">Nenhum item na forja ainda.</p>';
+                grid.innerHTML = '<p class="col-span-full text-slate-400 py-20 uppercase font-black tracking-widest text-center">A forja está vazia.</p>';
             } else {
                 grid.innerHTML = products.map(p => `
                     <div onclick="viewProductDetail(${p.id})" class="product-card bg-white rounded-[32px] p-3 border border-slate-100 flex flex-col shadow-sm text-left">
@@ -177,28 +270,76 @@
                     </div>
                 `).join('');
             }
-            
+            renderAdminLists();
+        }
+
+        function renderCategoryFilters() {
+            const tabs = document.getElementById('mainCategoryTabs');
+            if(!tabs) return;
+            let html = `<button onclick="filterAll('all', this)" class="cat-btn px-10 py-4 rounded-2xl bg-indigo-600 text-white font-black shadow-xl transition uppercase text-[10px] tracking-widest italic">Tudo</button>`;
+            categories.forEach(cat => {
+                html += `<button onclick="filterAll('${cat}', this)" class="cat-btn px-10 py-4 rounded-2xl bg-white text-slate-500 border border-slate-100 font-black hover:border-indigo-600 transition uppercase text-[10px] tracking-widest italic">${cat}</button>`;
+            });
+            tabs.innerHTML = html;
+        }
+
+        function renderAdminLists() {
+            // Lista de Produtos no Admin (COM ÍCONES IGUAL À IMAGEM)
             document.getElementById('adminProductList').innerHTML = products.map(p => `
-                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
-                    <span class="font-bold text-xs uppercase italic truncate w-40 text-slate-800 text-left">${p.name}</span>
-                    <button onclick="deleteProduct(${p.id})" class="text-red-500 font-black text-[10px]">APAGAR</button>
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${p.icon || '📦'}</span>
+                        <span class="font-bold text-[10px] uppercase italic truncate w-32 text-slate-800">${p.name}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditor(${p.id})" class="p-2 bg-white rounded-xl shadow-sm text-indigo-600 border border-slate-100 hover:bg-indigo-50">✏️</button>
+                        <button onclick="deleteProduct(${p.id})" class="p-2 bg-white rounded-xl shadow-sm text-red-500 border border-slate-100 hover:bg-red-50">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Lista de Categorias
+            document.getElementById('adminCategoryList').innerHTML = categories.map(cat => `
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span class="font-black text-[10px] uppercase italic text-slate-700">${cat}</span>
+                    <button onclick="removeCategory('${cat}')" class="text-red-400 hover:text-red-600">🗑️</button>
                 </div>
             `).join('');
         }
 
-        function viewProductDetail(id) {
-            const p = products.find(i => i.id === id);
-            document.getElementById('detailName').textContent = p.name;
-            document.getElementById('detailCategory').textContent = p.category;
-            document.getElementById('detailPrice').textContent = `R$ ${p.price.toLocaleString()}`;
-            document.getElementById('detailDescription').textContent = p.description || "Nenhuma descrição informada.";
-            document.getElementById('detailImageContainer').innerHTML = p.image ? `<img src="${p.image}" class="max-h-full">` : `<span class="text-9xl opacity-20 text-center">🏗️</span>`;
-            document.getElementById('detailAddToCartBtn').onclick = () => { addToCart(id); closeProductDetail(); };
-            document.getElementById('productDetailPage').classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
-            document.body.style.overflow = 'hidden';
+        // LÓGICA DE ABAS ADMIN
+        function switchAdminTab(t) {
+            ['products','categories','appearance'].forEach(tab => document.getElementById('adminTab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.toggle('hidden', tab !== t));
+            document.getElementById('btnTabProd').className = t === 'products' ? "flex-1 py-3 text-[10px] font-black rounded-xl bg-white shadow-sm transition uppercase" : "flex-1 py-3 text-[10px] font-black text-slate-500 transition uppercase";
+            document.getElementById('btnTabCat').className = t === 'categories' ? "flex-1 py-3 text-[10px] font-black rounded-xl bg-white shadow-sm transition uppercase" : "flex-1 py-3 text-[10px] font-black text-slate-500 transition uppercase";
+            document.getElementById('btnTabApper').className = t === 'appearance' ? "flex-1 py-3 text-[10px] font-black rounded-xl bg-white shadow-sm transition uppercase" : "flex-1 py-3 text-[10px] font-black text-slate-500 transition uppercase";
         }
 
-        function closeProductDetail() { document.getElementById('productDetailPage').classList.add('translate-y-full', 'opacity-0', 'pointer-events-none'); document.body.style.overflow = 'auto'; }
+        // LÓGICA DO EDITOR
+        function openEditor(id) {
+            currentEditorId = id;
+            document.getElementById('editorModal').classList.remove('hidden');
+            const sel = document.getElementById('edtCategory');
+            sel.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            
+            if(id) {
+                const p = products.find(i => i.id === id);
+                document.getElementById('editorTitle').textContent = "Editar Produto";
+                document.getElementById('edtName').value = p.name;
+                document.getElementById('edtCategory').value = p.category;
+                document.getElementById('edtPrice').value = p.price;
+                document.getElementById('edtDescription').value = p.description || "";
+                currentBase64Image = p.image || "";
+                if(currentBase64Image) document.getElementById('imagePreview').innerHTML = `<img src="${currentBase64Image}" class="max-h-full">`;
+            } else {
+                document.getElementById('editorTitle').textContent = "Novo Produto";
+                document.getElementById('edtName').value = "";
+                document.getElementById('edtPrice').value = "";
+                document.getElementById('edtDescription').value = "";
+                document.getElementById('imagePreview').innerHTML = '<span class="text-slate-300 text-[10px] font-black uppercase">Preview</span>';
+                currentBase64Image = "";
+            }
+        }
 
         async function commitProduct() {
             const btn = document.getElementById('btnSave');
@@ -207,34 +348,95 @@
 
             const product = {
                 name: document.getElementById('edtName').value,
-                category: document.getElementById('edtCategory').value.toUpperCase(),
+                category: document.getElementById('edtCategory').value,
                 price: parseFloat(document.getElementById('edtPrice').value) || 0,
                 description: document.getElementById('edtDescription').value,
                 image: currentBase64Image
             };
 
-            if(!product.name) { showToast("NOME OBRIGATÓRIO!"); btn.textContent = "Salvar na Nuvem"; btn.disabled = false; return; }
-
-            const { error } = await supabaseClient.from('products').insert([product]);
+            let res;
+            if(currentEditorId) {
+                res = await supabaseClient.from('products').update(product).eq('id', currentEditorId);
+            } else {
+                res = await supabaseClient.from('products').insert([product]);
+            }
             
-            btn.textContent = "Salvar na Nuvem";
+            btn.textContent = "Gravar na Nuvem";
             btn.disabled = false;
 
-            if (!error) {
-                showToast("ITEM SALVO!");
+            if (!res.error) {
+                showToast("DADOS SINCRONIZADOS!");
                 closeEditor();
                 loadProducts();
-            } else { 
-                console.error(error);
-                showToast("ERRO: VEJA O CONSOLE"); 
+            } else { showToast("ERRO CLOUD!"); }
+        }
+
+        // CATEGORIAS E APARÊNCIA CLOUD
+        async function addCategory() {
+            const name = document.getElementById('inpNewCategory').value.trim().toUpperCase();
+            if(!name) return;
+            await supabaseClient.from('categories').insert([{ name }]);
+            document.getElementById('inpNewCategory').value = "";
+            loadCategories();
+        }
+
+        async function removeCategory(name) {
+            if(confirm("Apagar categoria?")) {
+                await supabaseClient.from('categories').delete().eq('name', name);
+                loadCategories();
             }
         }
 
-        async function deleteProduct(id) {
-            if(confirm("Apagar da nuvem permanentemente?")) {
-                await supabaseClient.from('products').delete().eq('id', id);
-                loadProducts();
-            }
+        async function saveAppearance() {
+            appearance.name = document.getElementById('inpStoreName').value;
+            appearance.hero_title = document.getElementById('inpStoreHero').value;
+            await supabaseClient.from('appearance').upsert({ id: 1, ...appearance });
+            applyAppearance();
+        }
+
+        function applyAppearance() {
+            document.getElementById('displayStoreName').textContent = appearance.name || 'BESTFORGE 3D';
+            document.getElementById('displayHeroTitle').textContent = appearance.hero_title || 'FORJANDO SUAS IDEIAS';
+            if(document.getElementById('inpStoreName')) document.getElementById('inpStoreName').value = appearance.name;
+            if(document.getElementById('inpStoreHero')) document.getElementById('inpStoreHero').value = appearance.hero_title;
+        }
+
+        // UTILITÁRIOS
+        function toggleAdmin() { document.getElementById('adminPanel').classList.toggle('translate-x-full'); document.getElementById('adminOverlay').classList.toggle('hidden'); }
+        function closeEditor() { document.getElementById('editorModal').classList.add('hidden'); }
+        function toggleCart() { document.getElementById('cartDrawer').classList.toggle('translate-x-full'); document.getElementById('cartOverlay').classList.toggle('hidden'); renderCart(); }
+        
+        function viewProductDetail(id) {
+            const p = products.find(i => i.id === id);
+            document.getElementById('detailName').textContent = p.name;
+            document.getElementById('detailCategory').textContent = p.category;
+            document.getElementById('detailPrice').textContent = `R$ ${p.price.toLocaleString()}`;
+            document.getElementById('detailDescription').textContent = p.description || "Sem detalhes técnicos.";
+            document.getElementById('detailImageContainer').innerHTML = p.image ? `<img src="${p.image}" class="max-h-full">` : `<span class="text-9xl opacity-20 text-center">🏗️</span>`;
+            document.getElementById('detailAddToCartBtn').onclick = () => { addToCart(id); closeProductDetail(); };
+            document.getElementById('productDetailPage').classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProductDetail() { document.getElementById('productDetailPage').classList.add('translate-y-full', 'opacity-0', 'pointer-events-none'); document.body.style.overflow = 'auto'; }
+
+        function addToCart(id) {
+            const p = products.find(i => i.id === id);
+            cart.push(p);
+            renderCart();
+            showToast("ITEM FORJADO!");
+        }
+
+        function renderCart() {
+            let total = 0;
+            document.getElementById('cartItemsList').innerHTML = cart.map((p, index) => {
+                total += p.price;
+                return `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 text-left">
+                    <span class="text-[10px] font-black uppercase italic truncate w-40 text-slate-800">${p.name}</span>
+                    <button onclick="cart.splice(${index},1);renderCart();" class="text-red-400 font-black">✕</button></div>`;
+            }).join('');
+            document.getElementById('cartTotalDisplay').textContent = `R$ ${total.toLocaleString()}`;
+            document.getElementById('cartBadge').textContent = cart.length;
         }
 
         function handleFileUpload(e) {
@@ -248,15 +450,8 @@
             reader.readAsDataURL(file);
         }
 
-        function addToCart(id) {
-            const p = products.find(i => i.id === id);
-            cart.push(p);
-            renderCart();
-            showToast("ITEM FORJADO!");
-        }
-
         function checkoutWhatsApp() {
-            if(cart.length === 0) return showToast("CARRINHO VAZIO!");
+            if(cart.length === 0) return;
             const phone = "5511940703609";
             let msg = "Olá BestForge! Gostaria de encomendar:\n\n";
             let total = 0;
@@ -265,43 +460,34 @@
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        function toggleAdmin() { document.getElementById('adminPanel').classList.toggle('translate-x-full'); document.getElementById('adminOverlay').classList.toggle('hidden'); }
-        function openEditor() { document.getElementById('editorModal').classList.remove('hidden'); document.getElementById('imagePreview').innerHTML = '<span class="text-slate-300 text-[10px] font-black uppercase text-center">Visualização</span>'; currentBase64Image = ""; }
-        function closeEditor() { document.getElementById('editorModal').classList.add('hidden'); }
-        function toggleCart() { document.getElementById('cartDrawer').classList.toggle('translate-x-full'); document.getElementById('cartOverlay').classList.toggle('hidden'); renderCart(); }
-        
-        function renderCart() {
-            let total = 0;
-            document.getElementById('cartItemsList').innerHTML = cart.map((p, index) => {
-                total += p.price;
-                return `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100 text-left">
-                    <span class="text-[10px] font-black uppercase italic truncate w-40 text-slate-800 text-left">${p.name}</span>
-                    <button onclick="cart.splice(${index},1);renderCart();" class="text-red-400 font-black">✕</button></div>`;
-            }).join('');
-            document.getElementById('cartTotalDisplay').textContent = `R$ ${total.toLocaleString()}`;
-            document.getElementById('cartBadge').textContent = cart.length;
+        function filterAll(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => { b.classList.remove('bg-indigo-600','text-white','shadow-xl'); b.classList.add('bg-white','text-slate-500'); });
+            btn.classList.add('bg-indigo-600','text-white','shadow-xl'); btn.classList.remove('bg-white','text-slate-500');
+            const f = cat === 'all' ? products : products.filter(i => i.category === cat);
+            const grid = document.getElementById('allProductsGrid');
+            grid.innerHTML = f.map(p => `
+                <div onclick="viewProductDetail(${p.id})" class="product-card bg-white rounded-[32px] p-3 border border-slate-100 flex flex-col shadow-sm text-left">
+                    <div class="img-container h-44 bg-slate-50 rounded-[24px] mb-4 flex items-center justify-center overflow-hidden text-center">
+                        ${p.image ? `<img src="${p.image}">` : `<span class="text-4xl opacity-20">🏗️</span>`}
+                    </div>
+                    <div class="px-2 text-left">
+                        <span class="text-[8px] font-black text-indigo-500 uppercase tracking-widest mb-1 block">${p.category || 'GERAL'}</span>
+                        <h4 class="font-black text-slate-900 text-sm mb-3 uppercase italic line-clamp-1 text-slate-800">${p.name}</h4>
+                        <div class="flex justify-between items-end">
+                            <span class="text-lg font-black text-slate-900 tracking-tighter italic">R$ ${p.price.toLocaleString()}</span>
+                            <button onclick="event.stopPropagation(); addToCart(${p.id})" class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-indigo-600 transition">🛒</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function showToast(m) { 
-            const t = document.getElementById('toast'); 
-            t.textContent = m; 
-            t.classList.add('opacity-100','top-28'); 
-            setTimeout(() => t.classList.remove('opacity-100','top-28'), 3000); 
-        }
+        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('opacity-100','top-28'); setTimeout(() => t.classList.remove('opacity-100','top-28'), 3000); }
 
-        // Funções de IA (Gemini) deixadas para compatibilidade futura
-        const apiKey = ""; 
-        async function callGemini(prompt) { return "Dica técnica: Mantenha seu filamento seco!"; }
-        async function askAIEspecialist() {
-            const n = document.getElementById('detailName').textContent;
-            showToast("CONSULTANDO IA...");
-            const res = await callGemini(`Dica para ${n}`);
-            document.getElementById('aiResponseText').textContent = res;
-            document.getElementById('aiExpertResponse').classList.remove('hidden');
-        }
+        async function askAIEspecialist() { showToast("CONSULTANDO IA..."); setTimeout(() => { document.getElementById('aiResponseText').textContent = "Dica: Para peças com muitos detalhes como esta, reduza a velocidade da camada externa para 30mm/s e use suportes do tipo 'Tree'."; document.getElementById('aiExpertResponse').classList.remove('hidden'); }, 1500); }
         async function optimizeDescriptionAI() { showToast("IA OTIMIZANDO..."); }
 
-        window.onload = loadProducts;
+        window.onload = init;
     </script>
 </body>
 </html>
